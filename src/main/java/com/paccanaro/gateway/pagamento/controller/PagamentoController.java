@@ -31,7 +31,9 @@ public class PagamentoController {
         Pagamento pagamento = pagamentoService.criarPagamento(
                 usuario,
                 request.getValor(),
-                request.getMetodoPagamento()
+                request.getMetodoPagamento(),
+                request.getUltimosDigitosCartao(),
+                request.getBandeiraCartao()
         );
         return ResponseEntity.ok(pagamento);
     }

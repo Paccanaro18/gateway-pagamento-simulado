@@ -18,7 +18,8 @@ public class PagamentoService {
     @Autowired
     private WebhookSimuladoService webhookSimuladoService;
 
-    public Pagamento criarPagamento(Usuario usuario, BigDecimal valor, MetodoPagamento metodo) {
+    public Pagamento criarPagamento(Usuario usuario, BigDecimal valor, MetodoPagamento metodo,
+                                    String ultimosDigitosCartao, String bandeiraCartao) {
         Pagamento pagamento = new Pagamento();
         pagamento.setUsuario(usuario);
         pagamento.setValor(valor);
@@ -26,6 +27,9 @@ public class PagamentoService {
 
         if (metodo == MetodoPagamento.PIX) {
             pagamento.setDadosPix(gerarCodigoPixSimulado());
+        }  else if (metodo == MetodoPagamento.CARTAO){
+            pagamento.setUltimosDigitosCartao(ultimosDigitosCartao);
+            pagamento.setBandeiraCartao(bandeiraCartao);
         }
 
         Pagamento salvo = pagamentoRepository.save(pagamento);

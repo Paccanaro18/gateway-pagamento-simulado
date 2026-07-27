@@ -10,4 +10,6 @@ public class CriarPagamentoRequest {
 
     private BigDecimal valor;
     private MetodoPagamento metodoPagamento;
+    private String ultimosDigitosCartao;
+    private String bandeiraCartao;
 }
