@@ -35,6 +35,12 @@ public class Pagamento {
     @Column(nullable = false)
     private StatusPagamento status;
 
+    @Column(name = "ultimos_digitos_cartao")
+    private String ultimosDigitosCartao;
+
+    @Column(name = "bandeira_cartao")
+    private String bandeiraCartao;
+
 
     @Column(name = "codigo_transacao", nullable = false, unique = true)
     private String codigoTransacao;
