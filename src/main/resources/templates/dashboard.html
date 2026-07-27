@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; }
+    * { box-sizing: border-box; }
+    @keyframes fcRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .fc-logout-btn {
+      padding:9px 16px; border-radius:9px; border:1px solid rgba(255,255,255,0.18);
+      background:transparent; color:#c7d4dc; font-size:13px; font-weight:600; cursor:pointer;
+      transition:background 0.15s, color 0.15s;
+    }
+    .fc-logout-btn:hover {
+      background:rgba(255,255,255,0.08);
+      color:#fff;
+    }
+
+    .fc-stat-card {
+      background:#fff; border-radius:14px; box-shadow:0 12px 30px rgba(20,40,60,0.08);
+      padding:clamp(20px,2.5vw,26px); transition:box-shadow 0.3s, transform 0.3s;
+      animation: fcRise 0.6s ease-out both;
+    }
+    .fc-stat-card:hover {
+      box-shadow:0 18px 40px rgba(20,40,60,0.13);
+      transform:translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+<div style="font-family: Helvetica, Arial, sans-serif; min-height: 100vh; background: linear-gradient(160deg,#eef3f5,#e4ecf0);">
+
+  <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; padding: clamp(14px,2vw,20px) clamp(20px,5vw,48px); background:linear-gradient(160deg,#0a2233,#0d2b3d 60%,#0a2233);">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="width:32px; height:32px; border-radius:8px; background:#14b8a6; display:flex; align-items:center; justify-content:center; font-weight:700; color:#062a2a; font-size:16px; flex:none;">F</div>
+      <span style="color:#fff; font-weight:700; font-size:17px; letter-spacing:0.2px;">FinCore</span>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:34px; height:34px; border-radius:50%; background:#123246; color:#5ce1d6; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex:none;" th:text="${iniciais}">AP</div>
+        <div style="line-height:1.3;">
+          <div style="color:#fff; font-size:13px; font-weight:600;" th:text="${nome}">Artur Paccanaro</div>
+          <div style="color:#7d93a3; font-size:12px;" th:text="${email}">artur@email.com</div>
+        </div>
+      </div>
+      <form th:action="@{/logout}" method="post" style="margin:0;">
+        <button type="submit" class="fc-logout-btn">Sair</button>
+      </form>
+    </div>
+  </div>
+
+  <div style="max-width:1080px; margin:0 auto; padding: clamp(24px,4vw,48px) clamp(20px,5vw,48px) 64px;">
+
+    <div style="margin-bottom: clamp(24px,4vw,36px); animation: fcRise 0.5s ease-out both;">
+      <h1 style="margin:0 0 6px; font-family:'Playfair Display', Georgia, serif; font-weight:400; font-size:clamp(24px,3.4vw,34px); color:#101828;" th:text="'Olá, ' + ${nome}">Olá, Artur</h1>
+      <p style="margin:0; font-size:14px; color:#5b6b78;">Bem-vindo de volta ao seu painel FinCore.</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap: clamp(16px,2.5vw,20px); margin-bottom: clamp(28px,4vw,40px);">
+
+      <div class="fc-stat-card">
+        <div style="color:#7d93a3; font-size:12px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; margin-bottom:12px;">Total recebido</div>
+        <div style="font-size:clamp(24px,3vw,30px); font-weight:700; color:#101828;">R$ 0,00</div>
+      </div>
+
+      <div class="fc-stat-card">
+        <div style="color:#7d93a3; font-size:12px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; margin-bottom:12px;">Transações do mês</div>
+        <div style="font-size:clamp(24px,3vw,30px); font-weight:700; color:#101828;">0</div>
+      </div>
+
+      <div class="fc-stat-card">
+        <div style="color:#7d93a3; font-size:12px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; margin-bottom:12px;">Taxa de conversão</div>
+        <div style="font-size:clamp(24px,3vw,30px); font-weight:700; color:#101828;">0%</div>
+      </div>
+
+    </div>
+
+    <div style="background:#fff; border-radius:14px; box-shadow:0 12px 30px rgba(20,40,60,0.08); padding:clamp(28px,5vw,48px); animation: fcRise 0.7s ease-out both;">
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:clamp(20px,3vw,28px);">
+        <h2 style="margin:0; font-size:17px; font-weight:700; color:#101828;">Últimas transações</h2>
+      </div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding: clamp(24px,4vw,40px) 16px;">
+        <div style="width:56px; height:56px; border-radius:50%; background:#eef3f5; display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7d93a3" stroke-width="1.6">
+            <rect x="3" y="6" width="18" height="13" rx="2"></rect>
+            <path d="M3 10h18"></path>
+            <path d="M7 15h4"></path>
+          </svg>
+        </div>
+        <div style="font-size:16px; font-weight:700; color:#101828; margin-bottom:8px;">Nenhuma transação ainda</div>
+        <p style="margin:0 0 24px; font-size:14px; color:#5b6b78; max-width:360px; line-height:1.55;">Suas transações aparecerão aqui assim que você criar seu primeiro pagamento.</p>
+
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button disabled style="padding:12px 22px; border-radius:9px; border:none; background:#cfe8e4; color:#5b8f89; font-size:14px; font-weight:700; cursor:not-allowed;">Criar pagamento</button>
+          <span style="background:#14b8a6; color:#062a2a; font-size:11px; font-weight:700; letter-spacing:0.4px; padding:4px 9px; border-radius:999px; text-transform:uppercase;">Em breve</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
