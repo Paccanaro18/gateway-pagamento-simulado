@@ -1,9 +1,6 @@
 # FinCore — Gateway de Pagamentos Simulado
 
 Gateway de pagamentos simulado, inspirado em serviços como Stripe e PagSeguro, construído para estudo e portfólio. O projeto cobre autenticação sem senha via Google (OAuth2/OIDC), criação de pagamentos PIX e cartão com QR code real, e confirmação assíncrona simulando o comportamento de um webhook de processadora real.
-
-> Projeto de estudo desenvolvido por [Artur Paccanaro](https://github.com/Paccanaro18), como parte da preparação para vagas de desenvolvedor back-end Java em instituições financeiras.
-
 ---
 
 ## Índice
