@@ -257,4 +257,4 @@ Alguns dos problemas reais enfrentados e resolvidos durante o desenvolvimento:
 
 **Artur Paccanaro** — Estudante de Análise e Desenvolvimento de Sistemas (FMU), em transição para desenvolvimento back-end Java.
 
-[GitHub](https://github.com/Paccanaro18) · [LinkedIn](#)
+[GitHub](https://github.com/Paccanaro18) · [LinkedIn](https://www.linkedin.com/in/artur-paccanaro-196b34359/)
