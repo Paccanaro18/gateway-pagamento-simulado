@@ -29,6 +29,14 @@
       box-shadow:0 18px 40px rgba(20,40,60,0.13);
       transform:translateY(-2px);
     }
+
+    .fc-input {
+      width:100%; padding:10px; margin:6px 0 16px; border:1px solid #d9e0e5;
+      border-radius:8px; font-size:14px; font-family: Helvetica, Arial, sans-serif;
+    }
+    .fc-label {
+      font-size:12px; font-weight:700; color:#5b6b78; text-transform:uppercase;
+    }
   </style>
 </head>
 <body>
@@ -98,8 +106,7 @@
         <p style="margin:0 0 24px; font-size:14px; color:#5b6b78; max-width:360px; line-height:1.55;">Suas transações aparecerão aqui assim que você criar seu primeiro pagamento.</p>
 
         <div style="display:flex; align-items:center; gap:10px;">
-          <button disabled style="padding:12px 22px; border-radius:9px; border:none; background:#cfe8e4; color:#5b8f89; font-size:14px; font-weight:700; cursor:not-allowed;">Criar pagamento</button>
-          <span style="background:#14b8a6; color:#062a2a; font-size:11px; font-weight:700; letter-spacing:0.4px; padding:4px 9px; border-radius:999px; text-transform:uppercase;">Em breve</span>
+          <button onclick="abrirModal()" style="padding:12px 22px; border-radius:9px; border:none; background:#14b8a6; color:#062a2a; font-size:14px; font-weight:700; cursor:pointer;">Criar pagamento</button>
         </div>
       </div>
     </div>
@@ -107,5 +114,258 @@
   </div>
 </div>
 
+<div id="modalOverlay" style="display:none; position:fixed; inset:0; background:rgba(10,30,45,0.55); align-items:center; justify-content:center; z-index:100;">
+  <div style="background:#fff; border-radius:16px; padding:32px; width:360px; max-width:90vw; font-family: Helvetica, Arial, sans-serif;">
+
+    <div id="etapaFormulario">
+      <h3 style="margin:0 0 20px; font-size:18px; color:#101828;">Criar pagamento</h3>
+
+      <label class="fc-label">Valor (R$)</label>
+      <input id="inputValor" type="number" step="0.01" min="0.01" placeholder="0,00" class="fc-input">
+
+      <label class="fc-label">Método</label>
+      <select id="inputMetodo" class="fc-input" style="margin-bottom:24px;">
+        <option value="PIX">PIX</option>
+        <option value="CARTAO">Cartão de crédito</option>
+      </select>
+
+      <div style="display:flex; gap:10px;">
+        <button onclick="fecharModal()" style="flex:1; padding:12px; border-radius:9px; border:1px solid #d9e0e5; background:#fff; font-weight:600; cursor:pointer;">Cancelar</button>
+        <button onclick="criarPagamento()" style="flex:1; padding:12px; border-radius:9px; border:none; background:#14b8a6; color:#062a2a; font-weight:700; cursor:pointer;">Continuar</button>
+      </div>
+      <p id="erroFormulario" style="color:#a32d2d; font-size:13px; margin-top:12px; display:none;"></p>
+    </div>
+
+    <div id="etapaCartao" style="display:none;">
+      <h3 style="margin:0 0 20px; font-size:18px; color:#101828;">Dados do cartão</h3>
+
+      <label class="fc-label">Número do cartão</label>
+      <input id="inputNumeroCartao" type="text" maxlength="19" placeholder="0000 0000 0000 0000"
+             oninput="formatarNumeroCartao(this)" class="fc-input">
+
+      <label class="fc-label">Nome no cartão</label>
+      <input id="inputNomeCartao" type="text" placeholder="Como está impresso no cartão"
+             class="fc-input" style="text-transform:uppercase;">
+
+      <div style="display:flex; gap:12px;">
+        <div style="flex:1;">
+          <label class="fc-label">Validade</label>
+          <input id="inputValidadeCartao" type="text" maxlength="5" placeholder="MM/AA"
+                 oninput="formatarValidade(this)" class="fc-input">
+        </div>
+        <div style="flex:1;">
+          <label class="fc-label">CVV</label>
+          <input id="inputCvv" type="text" maxlength="3" placeholder="123" class="fc-input">
+        </div>
+      </div>
+
+      <p id="erroCartao" style="color:#a32d2d; font-size:13px; margin-bottom:12px; display:none;"></p>
+
+      <div style="display:flex; gap:10px;">
+        <button onclick="mostrarEtapa('etapaFormulario')" style="flex:1; padding:12px; border-radius:9px; border:1px solid #d9e0e5; background:#fff; font-weight:600; cursor:pointer;">Voltar</button>
+        <button onclick="confirmarCartao()" style="flex:1; padding:12px; border-radius:9px; border:none; background:#14b8a6; color:#062a2a; font-weight:700; cursor:pointer;">Pagar</button>
+      </div>
+    </div>
+
+    <div id="etapaAguardando" style="display:none; text-align:center;">
+      <h3 style="margin:0 0 16px; font-size:18px; color:#101828;">Aguardando pagamento</h3>
+
+      <div id="blocoPix" style="display:none;">
+        <img id="imgQrCode" style="width:200px; height:200px; border-radius:8px; border:1px solid #eee;">
+        <p style="font-size:11px; color:#5b6b78; margin:14px 0 6px;">Código PIX (copia e cola)</p>
+        <div style="display:flex; gap:6px;">
+          <input id="inputCodigoPix" readonly style="flex:1; padding:8px; font-size:11px; border:1px solid #d9e0e5; border-radius:6px; color:#5b6b78;">
+          <button onclick="copiarCodigoPix()" style="padding:8px 12px; border-radius:6px; border:1px solid #d9e0e5; background:#fff; cursor:pointer; font-size:12px;">Copiar</button>
+        </div>
+      </div>
+
+      <div id="blocoCartaoProcessando" style="display:none; padding:20px 0;">
+        <p id="textoCartaoProcessando" style="font-size:14px; color:#5b6b78;">Processando pagamento no cartão...</p>
+      </div>
+
+      <p style="font-size:12px; color:#9fb3c2; margin-top:20px;">Isso é uma simulação — a confirmação chega sozinha em alguns segundos.</p>
+    </div>
+
+    <div id="etapaSucesso" style="display:none; text-align:center;">
+      <div style="width:56px; height:56px; border-radius:50%; background:#e1f5f0; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f6e56" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h3 style="margin:0 0 8px; font-size:18px; color:#101828;">Pagamento confirmado!</h3>
+      <p style="font-size:13px; color:#5b6b78; margin-bottom:24px;">O status foi atualizado automaticamente.</p>
+      <button onclick="location.reload()" style="width:100%; padding:12px; border-radius:9px; border:none; background:#14b8a6; color:#062a2a; font-weight:700; cursor:pointer;">Fechar</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let pagamentoAtualId = null;
+  let intervaloPolling = null;
+
+  function abrirModal() {
+    document.getElementById('modalOverlay').style.display = 'flex';
+    mostrarEtapa('etapaFormulario');
+  }
+
+  function fecharModal() {
+    document.getElementById('modalOverlay').style.display = 'none';
+    if (intervaloPolling) clearInterval(intervaloPolling);
+  }
+
+  function mostrarEtapa(id) {
+    ['etapaFormulario', 'etapaCartao', 'etapaAguardando', 'etapaSucesso'].forEach(e => {
+      document.getElementById(e).style.display = (e === id) ? 'block' : 'none';
+    });
+  }
+
+  function criarPagamento() {
+    const valor = document.getElementById('inputValor').value;
+    const metodo = document.getElementById('inputMetodo').value;
+    const erroEl = document.getElementById('erroFormulario');
+    erroEl.style.display = 'none';
+
+    if (!valor || parseFloat(valor) <= 0) {
+      erroEl.textContent = 'Informe um valor válido.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    if (metodo === 'CARTAO') {
+      mostrarEtapa('etapaCartao');
+    } else {
+      finalizarCriacao(valor, metodo, null, null);
+    }
+  }
+
+  function formatarNumeroCartao(campo) {
+    let v = campo.value.replace(/\D/g, '').slice(0, 16);
+    campo.value = v.replace(/(.{4})/g, '$1 ').trim();
+  }
+
+  function formatarValidade(campo) {
+    let v = campo.value.replace(/\D/g, '').slice(0, 4);
+    if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2);
+    campo.value = v;
+  }
+
+  // Algoritmo de Luhn: validação matemática usada de verdade pela indústria
+  // para conferir se um número de cartão é estruturalmente válido
+  function validarLuhn(numero) {
+    let soma = 0;
+    let alternar = false;
+    for (let i = numero.length - 1; i >= 0; i--) {
+      let digito = parseInt(numero[i], 10);
+      if (alternar) {
+        digito *= 2;
+        if (digito > 9) digito -= 9;
+      }
+      soma += digito;
+      alternar = !alternar;
+    }
+    return soma % 10 === 0;
+  }
+
+  function detectarBandeira(numero) {
+    if (/^4/.test(numero)) return 'VISA';
+    if (/^5[1-5]/.test(numero)) return 'MASTERCARD';
+    if (/^3[47]/.test(numero)) return 'AMEX';
+    return 'DESCONHECIDA';
+  }
+
+  function confirmarCartao() {
+    const numero = document.getElementById('inputNumeroCartao').value.replace(/\s/g, '');
+    const nome = document.getElementById('inputNomeCartao').value.trim();
+    const validade = document.getElementById('inputValidadeCartao').value;
+    const cvv = document.getElementById('inputCvv').value;
+    const erroEl = document.getElementById('erroCartao');
+    erroEl.style.display = 'none';
+
+    if (numero.length < 13 || !validarLuhn(numero)) {
+      erroEl.textContent = 'Número de cartão inválido.';
+      erroEl.style.display = 'block';
+      return;
+    }
+    if (!nome) {
+      erroEl.textContent = 'Informe o nome do titular.';
+      erroEl.style.display = 'block';
+      return;
+    }
+    if (!/^\d{2}\/\d{2}$/.test(validade)) {
+      erroEl.textContent = 'Validade inválida.';
+      erroEl.style.display = 'block';
+      return;
+    }
+    if (cvv.length !== 3) {
+      erroEl.textContent = 'CVV inválido.';
+      erroEl.style.display = 'block';
+      return;
+    }
+
+    const ultimosDigitos = numero.slice(-4);
+    const bandeira = detectarBandeira(numero);
+
+    const valor = document.getElementById('inputValor').value;
+    finalizarCriacao(valor, 'CARTAO', ultimosDigitos, bandeira);
+  }
+
+  async function finalizarCriacao(valor, metodo, ultimosDigitos, bandeira) {
+    try {
+      const resposta = await fetch('/api/pagamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          valor: parseFloat(valor),
+          metodoPagamento: metodo,
+          ultimosDigitosCartao: ultimosDigitos,
+          bandeiraCartao: bandeira
+        })
+      });
+
+      if (!resposta.ok) throw new Error('Falha ao criar pagamento');
+
+      const pagamento = await resposta.json();
+      pagamentoAtualId = pagamento.id;
+
+      mostrarEtapa('etapaAguardando');
+      document.getElementById('blocoPix').style.display = (metodo === 'PIX') ? 'block' : 'none';
+      document.getElementById('blocoCartaoProcessando').style.display = (metodo === 'CARTAO') ? 'block' : 'none';
+
+      if (metodo === 'PIX') {
+        document.getElementById('imgQrCode').src = '/api/pagamentos/' + pagamento.id + '/qrcode';
+        document.getElementById('inputCodigoPix').value = pagamento.dadosPix;
+      } else {
+        document.getElementById('textoCartaoProcessando').textContent =
+          bandeira + ' final ' + ultimosDigitos + ' — processando...';
+      }
+
+      iniciarPolling(pagamento.id);
+
+    } catch (err) {
+      mostrarEtapa('etapaFormulario');
+      document.getElementById('erroFormulario').textContent = 'Não foi possível criar o pagamento.';
+      document.getElementById('erroFormulario').style.display = 'block';
+    }
+  }
+
+  function iniciarPolling(id) {
+    intervaloPolling = setInterval(async () => {
+      const resposta = await fetch('/api/pagamentos/' + id);
+      if (!resposta.ok) return;
+
+      const pagamento = await resposta.json();
+
+      if (pagamento.status === 'PAGO') {
+        clearInterval(intervaloPolling);
+        mostrarEtapa('etapaSucesso');
+      }
+    }, 3000);
+  }
+
+  function copiarCodigoPix() {
+    const campo = document.getElementById('inputCodigoPix');
+    campo.select();
+    navigator.clipboard.writeText(campo.value);
+  }
+</script>
 </body>
 </html>
