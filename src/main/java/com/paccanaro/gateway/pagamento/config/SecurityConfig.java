@@ -26,7 +26,13 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo ->  userInfo
                                 .oidcUserService(customOAuth2UserService)
                         )
-                        .defaultSuccessUrl("/home", true)
+                        .defaultSuccessUrl("/dashboard", true)
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login.html?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                 );
 
 
