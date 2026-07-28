@@ -48,8 +48,6 @@ O projeto segue arquitetura em camadas (**Controller → Service → Repository*
 
 ## Screenshots
 
-> Substitua os arquivos abaixo por capturas de tela reais do projeto rodando, salvando-os em `docs/screenshots/` com esses mesmos nomes. Recomenda-se ocultar a barra de favoritos do navegador antes de capturar.
-
 | Tela de login | Dashboard |
 |---|---|
 | ![Tela de login](docs/screenshots/login.png) | ![Dashboard](docs/screenshots/dashboard.png) |
